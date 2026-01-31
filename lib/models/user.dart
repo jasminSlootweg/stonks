@@ -9,6 +9,9 @@ class User {
   Map<Company, int> portfolio = {};
   List<Mail> inbox = []; 
   
+  // NEW: Tracks offers the user has accepted but haven't been processed by the engine yet
+  List<Offer> activeInvestments = [];
+
   double netWorth = 0.0;
   int debtStrikes = 0;
 
@@ -23,12 +26,14 @@ class User {
   }) {
     // Default Welcome Email
     inbox.add(News(
-      subject: 'Welcome to Scam Life!',
-      body: 'Your inbox delivers newsletters and insights. Watch out for scams!',
+      subject: 'Welcome to the Hustle!',
+      body: 'Your inbox delivers newsletters and insights. Watch out for scams, but remember: sometimes you have to spend money to make money.',
       affectedCompanies: {},
     ));
     calculateNetWorth();
   }
+
+  // --- Financial Getters ---
 
   double get monthlyCosts => rent + groceries + transportation + carInsurance + otherExpenses;
 
@@ -41,6 +46,22 @@ class User {
   void calculateNetWorth() {
     netWorth = cash + calculatePortfolioValue();
   }
+
+  // --- Saga / Offer Logic ---
+
+  /// Handles joining a saga or taking a one-time offer.
+  /// Returns true if the user had enough cash to invest.
+  bool invest(Offer offer) {
+    if (cash >= offer.investmentCost) {
+      cash -= offer.investmentCost;
+      activeInvestments.add(offer);
+      calculateNetWorth();
+      return true;
+    }
+    return false;
+  }
+
+  // --- Stock Market Logic ---
 
   void buyStock(Company company, int shares) {
     double cost = company.price * shares;

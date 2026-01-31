@@ -1,40 +1,59 @@
 import '../models/user.dart';
 import '../models/company.dart';
 import '../models/month_summary.dart';
+import '../models/mail.dart';
 
 class GameEngine {
   static const double baseSalary = 2500.0;
 
   static MonthSummary processNextMonth(User user, List<Company> companies) {
-    // 1. Capture snapshots for the summary report
     double oldPortfolioValue = user.calculatePortfolioValue();
 
-    // 2. Archive Inbox: Anything read this month moves to "Past Mail" next month
-    for (var mail in user.inbox) {
-      if (mail.isRead) {
-        mail.wasReadInPreviousMonth = true;
+    // 1. Process Sagas and Payouts
+    double totalInvestmentPayout = 0;
+    List<Mail> newMailsForInbox = [];
+
+    for (var investment in user.activeInvestments) {
+      // Calculate profit/return
+      // Ponzi logic: They give you a little back (rewardMultiplier) to make you trust them
+      double payout = investment.investmentCost * investment.rewardMultiplier;
+      totalInvestmentPayout += payout;
+
+      // If this investment leads to another email, queue it up
+      if (investment.nextMail != null) {
+        newMailsForInbox.add(investment.nextMail!);
       }
     }
 
-    // 3. Process User Finances
+    // Clear active investments (they processed)
+    user.activeInvestments.clear();
+    user.cash += totalInvestmentPayout;
+
+    // 2. Standard Finances
     user.cash += baseSalary;
     user.cash -= user.monthlyCosts;
 
-    // 4. Update Market Prices
+    // 3. Update Stocks & Probability
     for (var company in companies) {
       company.updatePrice();
     }
-    user.calculateNetWorth();
 
-    // 5. Calculate final summary data
+    // 4. Handle Inbox Maintenance
+    for (var mail in user.inbox) {
+      if (mail.isRead) mail.wasReadInPreviousMonth = true;
+    }
+    
+    // Add saga follow-ups to the top of the inbox
+    user.inbox.insertAll(0, newMailsForInbox);
+
     double newPortfolioValue = user.calculatePortfolioValue();
     double stockChange = newPortfolioValue - oldPortfolioValue;
 
     return MonthSummary(
-      incomeEarned: baseSalary,
+      incomeEarned: baseSalary + totalInvestmentPayout,
       expensesPaid: user.monthlyCosts,
       stockChange: stockChange,
-      netChange: (baseSalary - user.monthlyCosts) + stockChange,
+      netChange: (baseSalary + totalInvestmentPayout - user.monthlyCosts) + stockChange,
     );
   }
 }
