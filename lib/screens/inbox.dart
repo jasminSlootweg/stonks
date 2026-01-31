@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
-import 'widgets/top_section.dart';
+import '../widgets/top_section.dart';
+import '../models/user.dart';
 
 class InboxPage extends StatefulWidget {
-  const InboxPage({super.key});
+  // FIX: Added the user requirement
+  final User user;
+
+  const InboxPage({super.key, required this.user});
 
   @override
   State<InboxPage> createState() => _InboxPageState();
@@ -17,53 +21,43 @@ class _InboxPageState extends State<InboxPage> {
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
         backgroundColor: Colors.white,
-        foregroundColor: Colors.black, // back button color
+        foregroundColor: Colors.black,
         elevation: 1,
         title: const Text('Inbox'),
-        automaticallyImplyLeading: true, // <-- adds the back arrow
+        automaticallyImplyLeading: true,
       ),
       body: SafeArea(
         child: Column(
           children: [
-            // ---------- TOP SECTION ----------
-            const TopSection(),
+            // FIX: Pass the user from the widget to TopSection
+            TopSection(user: widget.user),
 
             const SizedBox(height: 8),
 
-            // ---------- INBOX ----------
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 children: [
                   const SizedBox(height: 12),
-
                   GestureDetector(
                     onTap: () {
-                      setState(() {
-                        isUnread = false;
-                      });
-
+                      setState(() => isUnread = false);
                       showDialog(
                         context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: const Text('Welcome to Scam Life!'),
-                            content: const Text(
-                              'Welcome to Scam Life!\n\n'
-                              'Your inbox will deliver monthly newsletters covering world events, '
-                              'economic shifts, and insights into what stocks may perform well in the future.\n\n'
-                              'You will also be notified about companies with declining profits and risky outlooks.\n\n'
-                              'Occasionally, you may find high-return investment opportunities here. '
-                              'Be cautious — some offers may be scams designed to exploit greedy investors.',
+                        builder: (context) => AlertDialog(
+                          title: const Text('Welcome to Scam Life!'),
+                          content: const Text(
+                            'Welcome to Scam Life!\n\n'
+                            'Your inbox will deliver monthly newsletters, economic shifts, and insights.\n\n'
+                            'Be cautious — some offers may be scams.',
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('Got it'),
                             ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text('Got it'),
-                              ),
-                            ],
-                          );
-                        },
+                          ],
+                        ),
                       );
                     },
                     child: Container(
@@ -74,7 +68,6 @@ class _InboxPageState extends State<InboxPage> {
                       ),
                       child: Row(
                         children: [
-                          // Unread indicator
                           if (isUnread)
                             Container(
                               width: 10,
@@ -85,7 +78,6 @@ class _InboxPageState extends State<InboxPage> {
                                 shape: BoxShape.circle,
                               ),
                             ),
-
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -93,28 +85,19 @@ class _InboxPageState extends State<InboxPage> {
                                 Text(
                                   'Welcome to Scam Life!',
                                   style: TextStyle(
-                                    fontWeight: isUnread
-                                        ? FontWeight.bold
-                                        : FontWeight.normal,
+                                    fontWeight: isUnread ? FontWeight.bold : FontWeight.normal,
                                   ),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
                                   'Your monthly investment intelligence…',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.grey[600],
-                                  ),
+                                  style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ],
                             ),
                           ),
-
-                          const Icon(
-                            Icons.chevron_right,
-                            color: Colors.grey,
-                          ),
+                          const Icon(Icons.chevron_right, color: Colors.grey),
                         ],
                       ),
                     ),

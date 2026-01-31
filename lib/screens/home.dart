@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'app_state.dart';
 import 'inbox.dart';
 import 'stocks.dart';
-import 'widgets/top_section.dart';
-
+import '../widgets/top_section.dart';
+import '../models/user.dart';
+import '../app_state.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  final User user;
+
+  const HomePage({super.key, required this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +18,7 @@ class HomePage extends StatelessWidget {
         child: Column(
           children: [
             // ---------- TOP SECTION ----------
-            const TopSection(),
+            TopSection(user: user), 
             const SizedBox(height: 20),
 
             // ---------- MAIN GRID ----------
@@ -35,23 +37,23 @@ class HomePage extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const InboxPage(),
+                            builder: (_) => InboxPage(user: user), // Passing user
                           ),
                         );
                       },
                     ),
-                    FeatureTile(  // <- removed const here
+                    FeatureTile(
                       icon: Icons.show_chart,
                       label: 'Stocks',
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const StocksPage(),
+                            builder: (_) => StocksPage(user: user), // Passing user
                           ),
                         );
                       },
-                    ), 
+                    ),
                     const FeatureTile(
                       icon: Icons.account_balance_wallet,
                       label: 'Budgeting',
@@ -105,7 +107,7 @@ class HomePage extends StatelessWidget {
   }
 }
 
-// ---------- GRID TILE WIDGET ----------
+// ---------- THE MISSING CLASS ----------
 class FeatureTile extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -120,8 +122,8 @@ class FeatureTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool showUnread =
-        label == 'Inbox' && hasUnreadInboxMail;
+    // Note: hasUnreadInboxMail needs to be defined in your app_state.dart
+    final bool showUnread = label == 'Inbox' && hasUnreadInboxMail;
 
     return Container(
       decoration: BoxDecoration(
@@ -134,7 +136,6 @@ class FeatureTile extends StatelessWidget {
         child: Column(
           children: [
             const Spacer(),
-
             Stack(
               children: [
                 Icon(
@@ -157,14 +158,11 @@ class FeatureTile extends StatelessWidget {
                   ),
               ],
             ),
-
             const SizedBox(height: 10),
-
             Text(
               label,
               style: const TextStyle(fontWeight: FontWeight.w600),
             ),
-
             const Spacer(),
           ],
         ),

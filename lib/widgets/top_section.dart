@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import '../models/user.dart';
 
 class TopSection extends StatelessWidget {
-  const TopSection({super.key});
+  final User user;
+
+  const TopSection({super.key, required this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +26,7 @@ class TopSection extends StatelessWidget {
           Expanded(
             child: Column(
               children: [
+                // Net Worth
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(12),
@@ -30,17 +34,18 @@ class TopSection extends StatelessWidget {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
+                      const Text(
                         'Net Worth',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      Text('\$0'),
+                      Text('\$${user.netWorth.toStringAsFixed(2)}'),
                     ],
                   ),
                 ),
+                // Cash & Monthly Costs
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(10),
@@ -51,14 +56,23 @@ class TopSection extends StatelessWidget {
                       bottomRight: Radius.circular(12),
                     ),
                   ),
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  child: Column(
                     children: [
-                      Text(
-                        'Cash',
-                        style: TextStyle(fontSize: 13),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('Cash', style: TextStyle(fontSize: 13)),
+                          Text('\$${user.cash.toStringAsFixed(2)}'),
+                        ],
                       ),
-                      Text('\$0'),
+                      const SizedBox(height: 4),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('Monthly Costs', style: TextStyle(fontSize: 13)),
+                          Text('\$${user.monthlyCosts.toStringAsFixed(2)}'),
+                        ],
+                      ),
                     ],
                   ),
                 ),
