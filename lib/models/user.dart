@@ -17,6 +17,14 @@ class User {
   // --- NEW: History tracking for the chart ---
   List<double> cashHistory = [];
 
+  // --- LIFE STATE FLAGS ---
+  bool hasCar = false;
+  bool isCarBroken = false;
+  int maintenanceSkips = 0; // Increases breakdown chance
+  int electricalSkips = 0;    // Increases fire chance
+  bool hasKids = false;
+  double baseSalary = 2500.0;
+
   User({
     required this.name,
     required this.cash,

@@ -1,28 +1,20 @@
 import 'user.dart';
 
-/// Represents a sudden life event that impacts the user's finances.
+class EventOption {
+  final String label;
+  final Function(User user) onSelected;
+
+  EventOption({required this.label, required this.onSelected});
+}
+
 class RandomEvent {
   final String title;
   final String description;
-  
-  /// The immediate financial impact on the user's cash.
-  /// Positive = Income/Bonus, Negative = Expense/Loss.
-  final double cashImpact;
-
-  /// Optional: If you want certain events to change monthly income permanently.
-  final double monthlyIncomeChange;
+  final List<EventOption> options;
 
   RandomEvent({
     required this.title,
     required this.description,
-    required this.cashImpact,
-    this.monthlyIncomeChange = 0.0,
+    required this.options,
   });
-
-  /// Logic stub to apply the event to the user
-  void execute(User user) {
-    // 1. Apply the one-time cash impact
-    // 2. Apply any permanent income/expense changes
-    // 3. Recalculate user net worth
-  }
 }
