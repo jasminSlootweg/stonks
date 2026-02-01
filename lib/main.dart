@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'screens/welcome_page.dart'; // Import the new welcome page
+import 'screens/welcome_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,11 +14,16 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Financial Literacy App',
       theme: ThemeData(
-        // Using ColorScheme is the modern way to set primary colors in Flutter
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+        // Setting the default font family for the whole app
+        fontFamily: 'PixelFont', 
+
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.green,
+          brightness: Brightness.dark, // Optional: Makes text white by default
+        ),
         useMaterial3: true,
       ),
-      home: const WelcomePage(), // Load the WelcomePage first
+      home: const WelcomePage(),
     );
   }
 }

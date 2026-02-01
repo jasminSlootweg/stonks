@@ -11,79 +11,99 @@ class WelcomePage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: const Color.fromRGBO(2, 30, 67, 1),
-      body: Center(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // ---------- LOGO ----------
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: sidePadding),
-                child: Image.asset(
-                  'assets/images/Stonks_logo.png',
-                  width: screenWidth - (sidePadding * 2),
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) =>
-                      const Icon(Icons.monetization_on, size: 100, color: Colors.green),
+      body: Stack(
+        children: [
+          // 1. MAIN UI CONTENT
+          SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // ---------- LOGO ----------
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: sidePadding),
+                      child: Image.asset(
+                        'assets/images/Stonks_logo.png',
+                        width: screenWidth - (sidePadding * 2),
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Icon(Icons.monetization_on, size: 100, color: Colors.green),
+                      ),
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    // ---------- TITLE ASSET ----------
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: sidePadding),
+                      child: Image.asset(
+                        'assets/images/Title_Page_Asset.png',
+                        width: screenWidth - (sidePadding * 2),
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) => const Text(
+                          "BIT SCAMS",
+                          style: TextStyle(color: Colors.white, fontSize: 40, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 60),
+
+                    // ---------- BUTTON GROUP ----------
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // ---------- START (PLAY) BUTTON ----------
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const UserCreationPage()),
+                            );
+                          },
+                          child: Image.asset(
+                            'assets/images/play_button.png',
+                            width: 220,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+
+                        const SizedBox(height: 2),
+
+                        // ---------- SETTINGS BUTTON ----------
+                        InkWell(
+                          onTap: () {
+                            // Settings logic
+                          },
+                          child: Image.asset(
+                            'assets/images/settings_button.png',
+                            width: 180,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
                 ),
               ),
-
-              const SizedBox(height: 10),
-
-              // ---------- TITLE ASSET ----------
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: sidePadding),
-                child: Image.asset(
-                  'assets/images/Title_Page_Asset.png',
-                  width: screenWidth - (sidePadding * 2),
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) => const Text(
-                    "BIT SCAMS",
-                    style: TextStyle(color: Colors.white, fontSize: 40, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 60),
-
-              // ---------- START BUTTON ----------
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const UserCreationPage()),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 18),
-                  backgroundColor: Colors.green,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  elevation: 5,
-                ),
-                child: const Text('Start', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-              ),
-
-              const SizedBox(height: 20),
-
-              // ---------- SETTINGS BUTTON ----------
-              OutlinedButton(
-                onPressed: () {
-                   // Add settings logic here
-                },
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                  side: const BorderSide(color: Colors.white38, width: 2),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                child: const Text('Settings', style: TextStyle(fontSize: 18)),
-              ),
-              
-              const SizedBox(height: 20),
-            ],
+            ),
           ),
-        ),
+
+          // 2. BACKGROUND CHARACTER (STONKS GUY)
+          // Using Positioned ensures he doesn't push the buttons or logo around.
+          Positioned(
+            bottom: 0,
+            left: 0,
+            child: Image.asset(
+              'assets/images/stonks_guy.png',
+              width: 160, // Adjust size based on your PNG resolution
+              fit: BoxFit.contain,
+              // Adding an errorBuilder so the app doesn't crash if the file is missing
+              errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+            ),
+          ),
+        ],
       ),
     );
   }
