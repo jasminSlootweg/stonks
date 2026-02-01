@@ -11,7 +11,9 @@ class User {
   List<Offer> activeInvestments = []; 
 
   double netWorth = 0.0;
-  int debtStrikes = 0;
+
+  // --- RESTORED FIELD ---
+  int debtStrikes = 0; 
 
   User({
     required this.name,
@@ -22,12 +24,13 @@ class User {
     required this.carInsurance,
     this.otherExpenses = 0.0,
   }) {
-    // Automatically inject the Welcome Email at start
     inbox.add(welcomeEmail);
     calculateNetWorth();
   }
 
   double get monthlyCosts => rent + groceries + transportation + carInsurance + otherExpenses;
+
+  // --- Financial Logic ---
 
   void calculateNetWorth() {
     double portfolioValue = 0.0;
@@ -41,15 +44,19 @@ class User {
     return total;
   }
 
+  // --- Investment Logic (Deducts Cash) ---
+
   bool invest(Offer offer) {
     if (cash >= offer.investmentCost) {
       cash -= offer.investmentCost;
       activeInvestments.add(offer);
       calculateNetWorth();
-      return true;
+      return true; 
     }
-    return false;
+    return false; 
   }
+
+  // --- Stock Market Logic ---
 
   void buyStock(Company company, int shares) {
     double cost = company.price * shares;
