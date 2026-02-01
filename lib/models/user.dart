@@ -47,14 +47,16 @@ class User {
   // --- Investment Logic (Deducts Cash) ---
 
   bool invest(Offer offer) {
-    if (cash >= offer.investmentCost) {
-      cash -= offer.investmentCost;
-      activeInvestments.add(offer);
-      calculateNetWorth();
-      return true; 
-    }
-    return false; 
+  if (cash >= offer.investmentCost) {
+    cash -= offer.investmentCost;
+    print("SUCCESS: New Cash Balance is \$${cash}"); // <--- Add this
+    activeInvestments.add(offer);
+    calculateNetWorth();
+    return true; 
   }
+  print("FAILED: Not enough cash.");
+  return false; 
+}
 
   // --- Stock Market Logic ---
 

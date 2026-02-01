@@ -16,22 +16,16 @@ class GameEngine {
     List<Mail> followUpMails = [];
 
     for (var investment in user.activeInvestments) {
-      // Calculate profit (Cost * Multiplier)
-      // Note: Multiplier 0.0 = Total loss (Scam), Multiplier 1.32 = 32% gain
       totalInvestmentPayout += (investment.investmentCost * investment.rewardMultiplier);
-      
-      // If there is a "Part 2" or "Part 3" email, it gets added next
       if (investment.nextMail != null) {
         followUpMails.add(investment.nextMail!);
       }
     }
     
-    // Reset active investments for the new month
     user.activeInvestments.clear();
     user.cash += totalInvestmentPayout;
 
     // 2. Select a Random Mail for the Month
-    // Avoid sending a saga opening if the user already has it in their inbox
     List<Mail> availablePool = potentialMails.where((m) {
       return !user.inbox.any((existing) => existing.subject == m.subject);
     }).toList();
@@ -53,21 +47,25 @@ class GameEngine {
       company.updatePrice();
     }
 
-    // 5. Standard Finances
+    // 5. Standard Finances & Debt Strike Logic
     user.cash += baseSalary;
     user.cash -= user.monthlyCosts;
+
+    // --- DEBT STRIKE LOGIC ---
+    if (user.cash < 0) {
+      user.debtStrikes++;
+    }
+    // -------------------------
 
     // 6. Manage Inbox Archive
     for (var mail in user.inbox) {
       mail.wasReadInPreviousMonth = true;
     }
     
-    // New mail goes to the top
     if (monthlyMail != null) {
       user.inbox.insert(0, monthlyMail);
     }
     
-    // Sagas appear above world news
     if (followUpMails.isNotEmpty) {
       user.inbox.insertAll(0, followUpMails);
     }

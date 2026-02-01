@@ -36,14 +36,8 @@ class _HomePageState extends State<HomePage> {
       // 2. Advance the UI Calendar
       currentMonthIndex = (currentMonthIndex + 1) % 12;
 
-      // 3. Bankruptcy Strike Logic
-      if (widget.user.cash < 0) {
-        widget.user.debtStrikes++;
-      } else {
-        widget.user.debtStrikes = 0;
-      }
-
-      // 4. Check for Game Over
+      // 3. Debt/Bankruptcy Check
+      // Note: GameEngine already increments debtStrikes, so we just check the status here
       if (widget.user.debtStrikes >= 2) {
         _showBankruptcyGameOver();
       } else {
@@ -81,7 +75,8 @@ class _HomePageState extends State<HomePage> {
                   style: TextStyle(color: Colors.redAccent, fontSize: 12, fontWeight: FontWeight.bold),
                 ),
               ),
-            _summaryRow('Salary', '+ \$${summary.incomeEarned}', Colors.greenAccent),
+            _summaryRow('Salary', '+ \$${GameEngine.baseSalary}', Colors.greenAccent),
+            _summaryRow('Investment Payouts', '+ \$${(summary.incomeEarned - GameEngine.baseSalary).toStringAsFixed(2)}', Colors.greenAccent),
             _summaryRow('Expenses', '- \$${summary.expensesPaid.toStringAsFixed(2)}', Colors.redAccent),
             _summaryRow('Market Flux', '\$${summary.stockChange.toStringAsFixed(2)}', 
                         summary.stockChange >= 0 ? Colors.greenAccent : Colors.redAccent),
@@ -103,7 +98,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  /// Reusable UI row for the summary dialog
   Widget _summaryRow(String label, String value, Color color) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -146,6 +140,7 @@ class _HomePageState extends State<HomePage> {
       body: SafeArea(
         child: Column(
           children: [
+            // Top section displays Cash and Net Worth
             TopSection(user: widget.user),
             const SizedBox(height: 20),
             Expanded(
@@ -159,12 +154,25 @@ class _HomePageState extends State<HomePage> {
                     FeatureTile(
                       icon: Icons.inbox,
                       label: 'Inbox',
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => InboxPage(user: widget.user))),
+                      // THE FIX: await the navigation and refresh on return
+                      onTap: () async {
+                        await Navigator.push(
+                          context, 
+                          MaterialPageRoute(builder: (_) => InboxPage(user: widget.user))
+                        );
+                        setState(() {}); // Refresh HomePage UI
+                      },
                     ),
                     FeatureTile(
                       icon: Icons.show_chart,
                       label: 'Stocks',
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => StocksPage(user: widget.user))),
+                      onTap: () async {
+                        await Navigator.push(
+                          context, 
+                          MaterialPageRoute(builder: (_) => StocksPage(user: widget.user))
+                        );
+                        setState(() {}); // Refresh HomePage UI
+                      },
                     ),
                     const FeatureTile(icon: Icons.account_balance_wallet, label: 'Budgeting'),
                     const FeatureTile(icon: Icons.pie_chart, label: 'Portfolio'),

@@ -97,7 +97,7 @@ final Offer horizonOpening = Offer(
 
 final Offer nigerianPrince = Offer(
   subject: "URGENT BUSINESS ASSISTANCE",
-  body: "I am a royal family member seeking help to transfer \$18 million. Receive 30% as a reward for your assistance.",
+  body: "I am a royal family member seeking helpa to transfer \$18 million. Receive 30% as a reward for your assistance.",
   investmentCost: 3000.0,
   isScam: true,
   rewardMultiplier: 0.0,
