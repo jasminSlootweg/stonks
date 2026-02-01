@@ -194,16 +194,44 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 20),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: GridView.count(
                   crossAxisCount: 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
+                  crossAxisSpacing: 1,
+                  mainAxisSpacing: 1,
+                  childAspectRatio: 1.1,
                   children: [
-                    FeatureTile(icon: Icons.inbox, label: 'Inbox', onTap: () async { await Navigator.push(context, MaterialPageRoute(builder: (_) => InboxPage(user: widget.user))); setState(() {}); }),
-                    FeatureTile(icon: Icons.show_chart, label: 'Stocks', onTap: () async { await Navigator.push(context, MaterialPageRoute(builder: (_) => StocksPage(user: widget.user))); setState(() {}); }),
-                    const FeatureTile(icon: Icons.account_balance_wallet, label: 'Budgeting'),
-                    FeatureTile(icon: Icons.pie_chart, label: 'Portfolio', onTap: () async { await Navigator.push(context, MaterialPageRoute(builder: (_) => PortfolioPage(user: widget.user))); setState(() {}); }),
+                    FeatureTile(
+                      imagePath: 'assets/images/inbox_button.png', 
+                      label: 'Inbox', 
+                      onTap: () async { 
+                        await Navigator.push(context, MaterialPageRoute(builder: (_) => InboxPage(user: widget.user))); 
+                        setState(() {}); 
+                      }
+                    ),
+                    FeatureTile(
+                      imagePath: 'assets/images/stocks_button.png', 
+                      label: 'Stocks', 
+                      onTap: () async { 
+                        await Navigator.push(context, MaterialPageRoute(builder: (_) => StocksPage(user: widget.user))); 
+                        setState(() {}); 
+                      }
+                    ),
+                    FeatureTile(
+                      imagePath: 'assets/images/budget_button.png', 
+                      label: 'Budgeting',
+                      onTap: () {
+                        // Add your budgeting logic here
+                      },
+                    ),
+                    FeatureTile(
+                      imagePath: 'assets/images/portfolio_button.png', 
+                      label: 'Portfolio', 
+                      onTap: () async { 
+                        await Navigator.push(context, MaterialPageRoute(builder: (_) => PortfolioPage(user: widget.user))); 
+                        setState(() {}); 
+                      }
+                    ),
                   ],
                 ),
               ),
@@ -232,19 +260,35 @@ class _HomePageState extends State<HomePage> {
 }
 
 class FeatureTile extends StatelessWidget {
-  final IconData icon;
-  final String label;
+  final String imagePath;
+  final String label; // Kept for semantics/tooltips if needed
   final VoidCallback? onTap;
-  const FeatureTile({super.key, required this.icon, required this.label, this.onTap});
+
+  const FeatureTile({
+    super.key, 
+    required this.imagePath, 
+    required this.label, 
+    this.onTap
+  });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
-      child: Container(
-        decoration: BoxDecoration(color: Colors.white.withOpacity(0.08), borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.white10)),
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(icon, size: 42, color: Colors.greenAccent), const SizedBox(height: 12), Text(label, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white))]),
+      splashColor: Colors.transparent,   // Removes the grey circular ripple
+      highlightColor: Colors.transparent, // Removes the tap highlight
+      child: Center(
+        child: Image.asset(
+          imagePath,
+          fit: BoxFit.contain, // Ensures the full button image is visible
+          errorBuilder: (context, error, stackTrace) => Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.broken_image, size: 42, color: Colors.redAccent),
+              Text(label, style: const TextStyle(color: Colors.white, fontSize: 10)),
+            ],
+          ),
+        ),
       ),
     );
   }
