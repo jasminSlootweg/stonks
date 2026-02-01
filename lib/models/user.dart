@@ -11,9 +11,11 @@ class User {
   List<Offer> activeInvestments = []; 
 
   double netWorth = 0.0;
+  int debtStrikes = 0;
+  int totalScamsEncountered = 0;
 
-  // --- RESTORED FIELD ---
-  int debtStrikes = 0; 
+  // --- NEW: History tracking for the chart ---
+  List<double> cashHistory = [];
 
   User({
     required this.name,
@@ -24,13 +26,13 @@ class User {
     required this.carInsurance,
     this.otherExpenses = 0.0,
   }) {
+    // Record starting cash as the first data point
+    cashHistory.add(cash); 
     inbox.add(welcomeEmail);
     calculateNetWorth();
   }
 
   double get monthlyCosts => rent + groceries + transportation + carInsurance + otherExpenses;
-
-  // --- Financial Logic ---
 
   void calculateNetWorth() {
     double portfolioValue = 0.0;
@@ -44,8 +46,6 @@ class User {
     return total;
   }
 
-  // --- Investment Logic (Deducts Cash) ---
-
   bool invest(Offer offer) {
     if (cash >= offer.investmentCost) {
       cash -= offer.investmentCost;
@@ -55,8 +55,6 @@ class User {
     }
     return false; 
   }
-
-  // --- Stock Market Logic ---
 
   void buyStock(Company company, int shares) {
     double cost = company.price * shares;

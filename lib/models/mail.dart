@@ -56,7 +56,7 @@ final News welcomeEmail = News(
 
 final News ponziBusted = News(
   subject: "Financial Crime Alert: RapidWealth Circle Shut Down",
-  body: "Authorities have shut down RapidWealth Circle, describing it as a large Ponzi scheme. Millions of dollars are believed to be lost.",
+  body: "Authorities have shut down RapidWealth Circle, describing it as a large Ponzi scheme. Millions of dollars are believed to be lost. Your account has been flagged for investigation.",
   affectedCompanies: {},
 );
 
@@ -71,51 +71,66 @@ final Offer ponziFollowUp = Offer(
   body: "Congratulations! Your investment is working. Reinvest \$500 now to maximize your earnings.",
   investmentCost: 500.0,
   isScam: true,
-  rewardMultiplier: 2.0,
+  rewardMultiplier: 2.0, // High bait payout to encourage further investment
   nextMail: ponziBusted,
 );
 
 // ---------- SAGA OPENERS ----------
 
 final Offer ponziOpening = Offer(
-  subject: "Turn \$500 Into \$10,000 in Just 30 Days!",
+  subject: "Turn \$1,500 Into \$20,000!",
   body: "A secret trading system guarantees massive returns. Invest \$1,500 today to secure your spot!",
   investmentCost: 1500.0,
   isScam: true,
-  rewardMultiplier: 1.32,
+  rewardMultiplier: 1.20, // 20% "profit" payout next month to trick the player
   nextMail: ponziFollowUp,
 );
 
 final Offer horizonOpening = Offer(
   subject: "Balanced Growth Portfolio",
-  body: "Steady, long-term returns. Our goal is 5-7% per year. Licensed professional management.",
+  body: "Steady, long-term returns. Our goal is 5-7% per year. Licensed professional management. One-time entry fee.",
   investmentCost: 2000.0,
   isScam: false,
-  rewardMultiplier: 1.0048,
+  rewardMultiplier: 1.05, // Clean 5% return
   nextMail: horizonUpdate,
 );
 
 final Offer nigerianPrince = Offer(
   subject: "URGENT BUSINESS ASSISTANCE",
-  body: "I am a royal family member seeking help to transfer \$18 million. Receive 30% as a reward for your assistance.",
+  body: "I am a royal family member seeking help to transfer \$18 million. We require a \$3,000 'processing fee' to release the funds.",
   investmentCost: 3000.0,
   isScam: true,
-  rewardMultiplier: 0.0,
+  rewardMultiplier: 0.0, // Total loss plus the Engine's extra penalty
 );
 
-// ---------- WORLD EVENTS ----------
+// ---------- WORLD EVENTS (NEWS) ----------
 
 final News pandemicEvent = News(
   subject: "Global Health Advisory",
-  body: "A new viral illness is spreading. Hospitals are monitoring rising numbers. Research labs are beginning vaccine studies.",
+  body: "A new viral illness is spreading. Markets are reacting with fear, though tech and pharma are seeing unusual activity.",
   affectedCompanies: {
-    // Note: ensure these company variables are imported/available
+    // These should match your Company instances in main.dart
+    // pharmaCo: 0.2, 
+    // techGiant: 0.1,
+    // airlines: -0.4,
   },
+);
+
+final News techCrash = News(
+  subject: "Tech Bubble Burst?",
+  body: "Major software firms report lower-than-expected earnings. Investors are fleeing high-growth stocks.",
+  affectedCompanies: {},
 );
 
 final News bullMarketEvent = News(
   subject: "Global Markets Rally",
-  body: "Economic confidence grows as consumer spending increases worldwide.",
+  body: "Economic confidence grows as consumer spending increases worldwide. Everything is green!",
+  affectedCompanies: {},
+);
+
+final News cryptoHype = News(
+  subject: "Digital Asset Surge",
+  body: "A new wave of interest in digital currencies is driving speculative fever. High volatility expected.",
   affectedCompanies: {},
 );
 
@@ -127,4 +142,6 @@ final List<Mail> potentialMails = [
   nigerianPrince,
   pandemicEvent,
   bullMarketEvent,
+  techCrash,
+  cryptoHype,
 ];

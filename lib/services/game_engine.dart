@@ -10,76 +10,63 @@ class GameEngine {
 
   static MonthSummary processNextMonth(User user, List<Company> allCompanies) {
     double oldTotalValue = user.cash + user.calculatePortfolioValue();
+    double netMailResult = 0;
 
-    // 1. Process Saga Payouts & Chains
-    double totalInvestmentPayout = 0;
+    // 1. Process Mail Investments
+    double totalPayout = 0;
+    double totalLosses = 0;
     List<Mail> followUpMails = [];
 
     for (var investment in user.activeInvestments) {
-      // Calculate profit (Cost * Multiplier)
-      // Note: Multiplier 0.0 = Total loss (Scam), Multiplier 1.32 = 32% gain
-      totalInvestmentPayout += (investment.investmentCost * investment.rewardMultiplier);
-      
-      // If there is a "Part 2" or "Part 3" email, it gets added next
-      if (investment.nextMail != null) {
-        followUpMails.add(investment.nextMail!);
+      double payout = investment.investmentCost * investment.rewardMultiplier;
+      totalPayout += payout;
+
+      if (investment.isScam) {
+        double penalty = investment.investmentCost * 0.25;
+        totalLosses += (investment.investmentCost + penalty);
+        user.cash -= penalty;
+      } else {
+        totalLosses += investment.investmentCost;
       }
+
+      if (investment.nextMail != null) followUpMails.add(investment.nextMail!);
     }
     
-    // Reset active investments for the new month
+    user.cash += totalPayout;
+    netMailResult = totalPayout - totalLosses;
     user.activeInvestments.clear();
-    user.cash += totalInvestmentPayout;
 
-    // 2. Select a Random Mail for the Month
-    // Avoid sending a saga opening if the user already has it in their inbox
-    List<Mail> availablePool = potentialMails.where((m) {
-      return !user.inbox.any((existing) => existing.subject == m.subject);
-    }).toList();
-
-    Mail? monthlyMail;
-    if (availablePool.isNotEmpty) {
-      monthlyMail = availablePool[_random.nextInt(availablePool.length)];
-    }
+    // 2. Select Mail & Update Markets
+    List<Mail> availablePool = potentialMails.where((m) => !user.inbox.any((e) => e.subject == m.subject)).toList();
+    Mail? monthlyMail = availablePool.isNotEmpty ? availablePool[_random.nextInt(availablePool.length)] : null;
     
-    // 3. Apply Market News Impact
-    if (monthlyMail != null && monthlyMail is News) {
-      monthlyMail.affectedCompanies.forEach((company, impact) {
-        company.updateProbability(impact);
-      });
+    if (monthlyMail is News) {
+      monthlyMail.affectedCompanies.forEach((c, i) => c.updateProbability(i));
     }
+    for (var company in allCompanies) { company.updatePrice(); }
 
-    // 4. Update Stock Market Prices
-    for (var company in allCompanies) {
-      company.updatePrice();
-    }
-
-    // 5. Standard Finances
+    // 3. Salary & Expenses
     user.cash += baseSalary;
     user.cash -= user.monthlyCosts;
 
-    // 6. Manage Inbox Archive
-    for (var mail in user.inbox) {
-      mail.wasReadInPreviousMonth = true;
-    }
+    // 4. Update History & States
+    if (user.cash < 0) { user.debtStrikes++; } else { user.debtStrikes = 0; }
     
-    // New mail goes to the top
-    if (monthlyMail != null) {
-      user.inbox.insert(0, monthlyMail);
-    }
-    
-    // Sagas appear above world news
-    if (followUpMails.isNotEmpty) {
-      user.inbox.insertAll(0, followUpMails);
-    }
+    for (var mail in user.inbox) { mail.wasReadInPreviousMonth = true; }
+    if (monthlyMail != null) user.inbox.insert(0, monthlyMail);
+    user.inbox.insertAll(0, followUpMails);
 
     user.calculateNetWorth();
-    double newTotalValue = user.cash + user.calculatePortfolioValue();
+    
+    // --- RECORD HISTORY FOR CHART ---
+    user.cashHistory.add(user.cash);
 
     return MonthSummary(
-      incomeEarned: baseSalary + totalInvestmentPayout,
+      incomeEarned: baseSalary,
       expensesPaid: user.monthlyCosts,
       stockChange: user.calculatePortfolioValue(), 
-      netChange: newTotalValue - oldTotalValue,
+      mailInvestmentResult: netMailResult,
+      netChange: (user.cash + user.calculatePortfolioValue()) - oldTotalValue,
     );
   }
 }

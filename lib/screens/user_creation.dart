@@ -19,7 +19,7 @@ class _UserCreationPageState extends State<UserCreationPage> {
     // Create the user object with starting stats
     final user = User(
       name: name,
-      cash: 5000.0, 
+      cash: 2000.0, 
       rent: 800.0,          
       groceries: 200.0,     
       transportation: 100.0,
