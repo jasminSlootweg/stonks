@@ -10,12 +10,15 @@ class MailDetailView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isOffer = mail is Offer;
+
     return Scaffold(
       backgroundColor: const Color.fromRGBO(2, 30, 67, 1),
       appBar: AppBar(
-        title: const Text("Message Details"),
+        title: const Text("Message Details", style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -24,9 +27,11 @@ class MailDetailView extends StatelessWidget {
           children: [
             Text(
               mail.subject,
-              style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+              style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
             ),
-            const Divider(color: Colors.white24, height: 30),
+            const SizedBox(height: 10),
+            const Divider(color: Colors.white24),
+            const SizedBox(height: 10),
             Expanded(
               child: SingleChildScrollView(
                 child: Text(
@@ -36,40 +41,73 @@ class MailDetailView extends StatelessWidget {
               ),
             ),
             
-            // --- CONDITIONAL BUTTON AREA ---
-            
-            if (mail is Offer) ...[
-              const SizedBox(height: 20),
+            const SizedBox(height: 20),
+
+            if (isOffer) ...[
+              // ---------- INVEST BUTTON ----------
               ElevatedButton(
                 onPressed: () {
-                  bool success = user.invest(mail as Offer);
+                  final offer = mail as Offer;
+                  // This triggers the cash deduction in the User model
+                  bool success = user.invest(offer); 
+
                   if (success) {
-                    Navigator.pop(context);
+                    user.inbox.remove(mail); // Remove deal from inbox
+                    Navigator.pop(context); // Return to InboxPage
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Investment Successful!")),
+                      SnackBar(
+                        content: Text("Invested \$${offer.investmentCost.toStringAsFixed(0)}"),
+                        backgroundColor: Colors.green,
+                      ),
                     );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Not enough cash!")),
+                      const SnackBar(
+                        content: Text("Insufficient funds!"),
+                        backgroundColor: Colors.redAccent,
+                      ),
                     );
                   }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
-                  minimumSize: const Size(double.infinity, 50),
+                  minimumSize: const Size(double.infinity, 55),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                child: Text("Invest \$${(mail as Offer).investmentCost}"),
+                child: Text(
+                  "INVEST \$${(mail as Offer).investmentCost.toStringAsFixed(0)}",
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+              
+              const SizedBox(height: 12),
+
+              // ---------- SKIP BUTTON ----------
+              OutlinedButton(
+                onPressed: () {
+                  user.inbox.remove(mail); // Forever gone
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Deal declined.")),
+                  );
+                },
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Colors.redAccent, width: 2),
+                  minimumSize: const Size(double.infinity, 55),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: const Text("Skip Deal", style: TextStyle(color: Colors.redAccent, fontSize: 18)),
               ),
             ] else ...[
-              // If it's just News (like the Welcome email), show a simple "Done" button
-              const SizedBox(height: 20),
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Center(
-                  child: Text("Back to Inbox", style: TextStyle(color: Colors.greenAccent, fontSize: 16)),
+              // BACK BUTTON FOR NEWS
+              Center(
+                child: TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Back to Inbox", style: TextStyle(color: Colors.greenAccent, fontSize: 16)),
                 ),
               ),
             ],
+            const SizedBox(height: 10),
           ],
         ),
       ),
